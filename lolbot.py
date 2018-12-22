@@ -28,7 +28,7 @@ def alexa():
         "outputSpeech": {
             "type": "SSML",
             #"text": "Plain text string to speak",
-            "ssml": '<prosody pitch="+0%">hello</prosody> <prosody pitch="+30%">hello</prosody> <prosody pitch="-30%">hello</prosody>',
+            "ssml": '<speak><prosody pitch="+0%">hello</prosody> <prosody pitch="+30%">hello</prosody> <prosody pitch="-30%">hello</prosody></speak>',
             "playBehavior": "REPLACE_ENQUEUED"      
         },
     }
