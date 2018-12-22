@@ -20,6 +20,20 @@ def lol_bot():
     modified = "".join(c+c for c in text)
     return f'lol {modified}'
 
+@app.route('/alexa', methods=['POST', 'GET'])
+def alexa():
+  return jsonify({
+    'version': '0.1',
+    'response': {
+        "outputSpeech": {
+            "type": "SSML",
+            #"text": "Plain text string to speak",
+            "ssml": '<prosody pitch="+0%">hello</prosody> <prosody pitch="+30%">hello</prosody> <prosody pitch="-30%">hello</prosody>',
+            "playBehavior": "REPLACE_ENQUEUED"      
+        },
+    }
+  })
+
 
 
 # Start the web server!
