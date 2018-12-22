@@ -17,7 +17,8 @@ def lol_bot():
     # Get the value of the 'text' query parameter
     # request.form is a dictionary (cool!)
     text = request.form.get('text')
-    return f'lol {text}'
+    modified = str.join(c+c for c in text)
+    return f'lol {modified}'
 
 
 
