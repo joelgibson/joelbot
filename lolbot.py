@@ -44,7 +44,7 @@ def slack_events():
     
     if content['type'] == 'event_callback':
         event = content['event']
-        if event['subtype'] != 'bot_message':
+        if event.get('subtype', None) != 'bot_message':
             send_message(
                 channel=event['channel'],
                 text=f"You said: {event['text']}")
