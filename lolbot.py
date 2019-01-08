@@ -31,6 +31,9 @@ def slack_events():
         return jsonify({"text": "I am a test message",
                         "attachments": [{"text": "And here’s an attachment!"}]
                         })
+    
+    print(content)
+    
 
 @app.route('/alexa', methods=['POST', 'GET'])
 def alexa():
