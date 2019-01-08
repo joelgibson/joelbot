@@ -23,7 +23,7 @@ def lol_bot():
 
 def send_message(channel, text):
     headers = {
-        'Authorization': 'a1RVVG8u7Rp2ByCIDjFRYu0D-927726508815-772081506015-bxox'[::-1],
+        'Authorization': 'Bearer ' + 'a1RVVG8u7Rp2ByCIDjFRYu0D-927726508815-772081506015-bxox'[::-1],
         'Content-Type': 'application/json'
     }
     data = {
