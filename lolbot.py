@@ -20,6 +20,13 @@ def lol_bot():
     modified = "".join(c+c for c in text)
     return f'lol {modified}'
 
+@app.route('/slack/events', methods=['POST'])
+def slack_events():
+    content = request.get_json()
+
+    if content['type'] == 'url_verification':
+        return jsonify({'challenge': content['challenge']})
+
 @app.route('/alexa', methods=['POST', 'GET'])
 def alexa():
   return jsonify({
