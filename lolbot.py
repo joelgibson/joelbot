@@ -45,7 +45,7 @@ def slack_events():
         event = content['event']
         send_message(
             channel=event['channel'],
-            text=)
+            text=f"You said: {event['text']}")
         return "Ok done, have a nice day"
     
     print(content)
