@@ -26,6 +26,11 @@ def slack_events():
 
     if content['type'] == 'url_verification':
         return jsonify({'challenge': content['challenge']})
+    
+    if content['type'] == 'app_mention':
+        return jsonify({"text": "I am a test message",
+                        "attachments": [{"text": "And here’s an attachment!"}]
+                        })
 
 @app.route('/alexa', methods=['POST', 'GET'])
 def alexa():
