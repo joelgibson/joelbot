@@ -33,7 +33,7 @@ def send_message(channel, text):
     return requests.post(
         'https://slack.com/api/chat.postMessage',
         json=data,
-        header=header)
+        headers=headers)
 
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
