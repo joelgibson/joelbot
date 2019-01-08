@@ -1,5 +1,6 @@
 # Import flask with the request object
 from flask import Flask, request, jsonify
+import requests
 
 # Create the web server
 app = Flask(__name__)
