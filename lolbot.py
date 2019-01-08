@@ -20,6 +20,20 @@ def lol_bot():
     modified = "".join(c+c for c in text)
     return f'lol {modified}'
 
+def send_message(channel, text):
+    headers = {
+        'Authorization': 'a1RVVG8u7Rp2ByCIDjFRYu0D-927726508815-772081506015-bxox'[::-1],
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'text': text,
+        'channel': channel
+    }
+    return requests.post(
+        'https://slack.com/api/chat.postMessage',
+        json=data,
+        header=header)
+
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
     content = request.get_json()
@@ -29,11 +43,14 @@ def slack_events():
     
     if content['type'] == 'event_callback':
         event = content['event']
-        return jsonify({'text': f"I am a test message, you said {event['text']}",
-                        'attachments': [{'text': "And here’s an attachment!"}]
-                        })
+        send_message(
+            channel=event['channel'],
+            text=)
+        return "Ok done, have a nice day"
     
     print(content)
+
+
 
 
 @app.route('/alexa', methods=['POST', 'GET'])
