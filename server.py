@@ -40,10 +40,21 @@ def lockoutbot_endpoint():
 
     return output2
 
+def alexa_response(text, shouldEndSession=False):
+    return jsonify({
+        'version': '0.1',
+        'response': {
+            'outputSpeech': {
+                'type': 'SSML',
+                'ssml': f"""<speak><voice name="Joey">{text}</voice></speak>"""
+            },
+            'shouldEndSession': shouldEndSession
+        }
+    })
+
 @app.route('/alexa/lockoutbot', methods=['GET', 'POST'])
 def lockoutbot_alexa_endpoint():
     global state, context
-    shouldEndSession = False
     print(request.get_json())
 
     request_data = request.get_json()
@@ -73,8 +84,7 @@ def lockoutbot_alexa_endpoint():
         # next slash command is back at the start.
         if state == 'END':
             state, context = 'START', {}
-            output = 'Thanks for the chat!'
-            shouldEndSession = True
+            return alexa_response("Thanks for the chat!", shouldEndSession=True)
 
     # Do something based on the state
     print(f'Starting action ({state}, {context})')
@@ -82,16 +92,7 @@ def lockoutbot_alexa_endpoint():
 
     print(f'Giving response {output}')
 
-    return jsonify({
-        'version': '0.1',
-        'response': {
-            'outputSpeech': {
-                'type': 'SSML',
-                'ssml': f"""<speak><voice name="Joey">{output}</voice></speak>"""
-            },
-            'shouldEndSession': shouldEndSession
-        }
-    })
+    return alexa_response(output)
 
 
 if __name__ == '__main__':
