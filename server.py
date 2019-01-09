@@ -32,7 +32,7 @@ def lockoutbot_endpoint():
         return 'Thanks for the chat!'
 
     # Perform the action for the new state
-    output2 = scalebot.ACTION[state](context)
+    output2 = lockoutbot.ACTION[state](context)
 
     # Smoosh the outputs together, taking into account the fact that
     # the first output might be None.
