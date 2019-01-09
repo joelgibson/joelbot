@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import lockoutbot
 
 app = Flask(__name__)
@@ -39,6 +39,18 @@ def lockoutbot_endpoint():
         return f"{output1}\n{output2}"
 
     return output2
+
+@app.route('/alexa/lockoutbot', methods=['GET', 'POST'])
+def lockoutbot_alexa_endpoint():
+    return jsonify({
+        'version': '0.1',
+        'response': {
+            'outputSpeech': {
+                'type': 'SSML',
+                'ssml': """<speak><voice name="Joey">Hello from bot</voice></speak>"""
+            }
+        }
+    })
 
 
 if __name__ == '__main__':
