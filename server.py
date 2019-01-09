@@ -68,6 +68,12 @@ def lockoutbot_alexa_endpoint():
             output += output1 + '\n'
         print(f'Result ({state}, {context})')
 
+        # The special 'END' state here should reset the bot, so that the
+        # next slash command is back at the start.
+        if state == 'END':
+            state, context = 'START', {}
+            return 'Thanks for the chat!'
+
     # Do something based on the state
     print(f'Starting action ({state}, {context})')
     output += lockoutbot.ACTION[state](context)
