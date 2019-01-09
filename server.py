@@ -21,7 +21,7 @@ state, context = scalebot.START_STATE, None
 def scale_bot_endpoint():
     global state, context
 
-    print(request.get_json())
+    print(request.form)
 
     line = request.form.get('text')
     state, context, output = scalebot.INPUT[state](line, context)
@@ -32,12 +32,12 @@ def scale_bot_endpoint():
 
     output2 = scalebot.ACTION[state](context)
 
-    if output:
-        output2 = output + '\n' + output2
-    
-    return output2
+    return f"{output}\n{output2}"
 
 
+@app.route('/alexa/scalebot')
+def alexa_scalebot():
+    return ""
 
 # You can message lol_bot via <your website>/lol
 #@app.route('/lol')
