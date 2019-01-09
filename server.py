@@ -1,10 +1,6 @@
-# Import flask with the request object
 from flask import Flask, request, jsonify
-import requests
+import lockoutbot
 
-import scalebot
-
-# Create the web server
 app = Flask(__name__)
 
 # Let's have a nice homepage.
@@ -13,98 +9,92 @@ def home_page():
     return "Hi, you've reached Joel's server."
 
 
-# This listens to a slash command from slack. We need to
-# remember the current state.
-state, context = scalebot.START_STATE, None
+# Listen to /lockout from slack. The state and context are global, so
+# there is only a single conversation running with lockout bot at a time.
+state, context = 'START', {}
 
-@app.route('/scalebot', methods=['POST'])
-def scale_bot_endpoint():
+@app.route('/lockoutbot', methods=['POST'])
+def lockoutbot_endpoint():
     global state, context
 
-    print(request.form)
-
+    # The user has just given us a line of input. Request the next
+    # state transition, context, and optional output. We save the
+    # output for later, since we still have to perform the action for
+    # the new state.
     line = request.form.get('text')
-    state, context, output = scalebot.INPUT[state](line, context)
+    state, context, output1 = lockoutbot.INPUT[state](line, context)
 
+    # The special 'END' state here should reset the bot, so that the
+    # next slash command is back at the start.
     if state == 'END':
-        state, context = scalebot.START_STATE, None
+        state, context = 'START', {}
         return 'Thanks for the chat!'
 
-    output2 = scalebot.ACTION[state](context)
+    # Perform the action for the new state
+    output2 = lockoutbot.ACTION[state](context)
 
-    return f"{output}\n{output2}"
+    # Smoosh the outputs together, taking into account the fact that
+    # the first output might be None.
+    if output1:
+        return f"{output1}\n{output2}"
 
-@app.route('/alexa/scalebot')
-def alexa_scalebot():
-    return ""
+    return output2
 
-# You can message lol_bot via <your website>/lol
-#@app.route('/lol')
-@app.route('/lol', methods=['POST'])
-def lol_bot():
-    # Get the value of the 'text' query parameter
-    # request.args is a dictionary (cool!)
-    #text = request.args.get('text')
-    # This bot lols at every command it gets sent!
-    #return f'lol {text}'
+def alexa_response(text, shouldEndSession=False):
+    return jsonify({
+        'version': '0.1',
+        'response': {
+            'outputSpeech': {
+                'type': 'SSML',
+                'ssml': f"""<speak><voice name="Joey">{text}</voice></speak>"""
+            },
+            'shouldEndSession': shouldEndSession
+        }
+    })
 
-    # Get the value of the 'text' query parameter
-    # request.form is a dictionary (cool!)
-    text = request.form.get('text')
-    modified = "".join(c+c for c in text)
-    return f'lol {modified}'
+@app.route('/alexa/lockoutbot', methods=['GET', 'POST'])
+def lockoutbot_alexa_endpoint():
+    global state, context
+    print(request.get_json())
 
-def send_message(channel, text):
-    headers = {
-        'Authorization': 'Bearer ' + 'a1RVVG8u7Rp2ByCIDjFRYu0D-927726508815-772081506015-bxox'[::-1],
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'text': text,
-        'channel': channel
-    }
-    return requests.post(
-        'https://slack.com/api/chat.postMessage',
-        json=data,
-        headers=headers)
+    request_data = request.get_json()
+    request_type = request_data['request']['type']
+    try:
+        request_query = request_data['request']['intent']['slots']['query']['value']
+    except KeyError:
+        request_query = ''
 
-@app.route('/slack/events', methods=['POST'])
-def slack_events():
-    content = request.get_json()
+    request_type = request.json['request']['type']
+    output = ''
 
-    if content['type'] == 'url_verification':
-        return jsonify({'challenge': content['challenge']})
-    
-    if content['type'] == 'event_callback':
-        event = content['event']
-        if event.get('subtype', None) != 'bot_message':
-            send_message(
-                channel=event['channel'],
-                text=f"You said: {event['text']}")
-            return "Ok done, have a nice day"
-    
-    print(content)
-    return "Didn't do anything"
+    # We are starting, so we should reset the state
+    if request_type == 'LaunchRequest':
+        state, context = 'START', {}
+        print('Launched, resetting state')
+        
+    elif request_type == 'IntentRequest':
+        print(f'Processing {request_query} with ({state}, {context})')
+        # Intents will have some input, so we need to process it
+        # Change the conversation state based on the message from the user
+        state, context, output1 = lockoutbot.INPUT[state](request_query, context)
+        if output1:
+            output += output1 + '\n'
+        print(f'Result ({state}, {context})')
 
+        # The special 'END' state here should reset the bot, so that the
+        # next slash command is back at the start.
+        if state == 'END':
+            state, context = 'START', {}
+            return alexa_response("Thanks for the chat!", shouldEndSession=True)
 
+    # Do something based on the state
+    print(f'Starting action ({state}, {context})')
+    output += lockoutbot.ACTION[state](context)
 
+    print(f'Giving response {output}')
 
-@app.route('/alexa', methods=['POST', 'GET'])
-def alexa():
-  return jsonify({
-    'version': '0.1',
-    'response': {
-        "outputSpeech": {
-            "type": "SSML",
-            #"text": "Plain text string to speak",
-            "ssml": '<speak><prosody pitch="+0%">hello</prosody> <prosody pitch="+30%">hello</prosody> <prosody pitch="-30%">hello</prosody></speak>',
-            "playBehavior": "REPLACE_ENQUEUED"      
-        },
-    }
-  })
+    return alexa_response(output)
 
 
-
-# Start the web server!
 if __name__ == '__main__':
     app.run()
