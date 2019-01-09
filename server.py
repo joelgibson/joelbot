@@ -21,6 +21,8 @@ state, context = scalebot.START_STATE, None
 def scale_bot_endpoint():
     global state, context
 
+    print(request.get_json())
+
     line = request.form.get('text')
     state, context, output = scalebot.INPUT[state](line, context)
 
