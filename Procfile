@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:$PORT lolbot:app
+web: gunicorn --bind 0.0.0.0:$PORT server:app

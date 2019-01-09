@@ -2,8 +2,36 @@
 from flask import Flask, request, jsonify
 import requests
 
+import scalebot
+
 # Create the web server
 app = Flask(__name__)
+
+# Let's have a nice homepage.
+@app.route('/')
+def home_page():
+    return "Hi, you've reached Joel's server."
+
+
+# This listens to a slash command from slack. We need to
+# remember the current state.
+state, context = scalebot.START_STATE, None
+
+@app.route('/scalebot', methods=['POST'])
+def scale_bot_endpoint():
+    global state, context
+
+    line = request.form.get('text')
+    state, context, output = scalebot.INPUT[state](line, context)
+
+    output2 = scalebot.ACTION[state](context)
+
+    if output:
+        output2 = output + '\n' + output2
+    
+    return output2
+
+
 
 # You can message lol_bot via <your website>/lol
 #@app.route('/lol')
