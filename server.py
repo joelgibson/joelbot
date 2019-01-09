@@ -1,7 +1,6 @@
-# Import flask with the request object
 from flask import Flask, request
+import lockoutbot
 
-# Create the web server
 app = Flask(__name__)
 
 # Let's have a nice homepage.
@@ -10,8 +9,8 @@ def home_page():
     return "Hi, you've reached Joel's server."
 
 
-# Listen to /lockout from slack. The state and context are global.
-import lockoutbot
+# Listen to /lockout from slack. The state and context are global, so
+# there is only a single conversation running with lockout bot at a time.
 state, context = 'START', {}
 
 @app.route('/lockoutbot', methods=['POST'])
@@ -42,6 +41,5 @@ def lockoutbot_endpoint():
     return output2
 
 
-# Start the web server!
 if __name__ == '__main__':
     app.run()
