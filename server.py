@@ -71,6 +71,7 @@ def lockoutbot_alexa_endpoint():
     if request_type == 'LaunchRequest':
         state, context = 'START', {}
         print('Launched, resetting state')
+        
     elif request_type == 'IntentRequest':
         print(f'Processing {request_query} with ({state}, {context})')
         # Intents will have some input, so we need to process it
