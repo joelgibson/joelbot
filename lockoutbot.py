@@ -66,7 +66,10 @@ def send_help_input(line, context):
     else:
         return ('START', {}, None)
 
-
+# Mappings of states to action functions and input functions.
+# Note that the special 'END' state is conspicuously missing from
+# this list: this is because each front-end will need to deal
+# with it specially.
 ACTION = {
     'START': start_action,
     'ASK_WHERE': ask_where_action,

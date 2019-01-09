@@ -8,11 +8,11 @@ app = Flask(__name__)
 def home_page():
     return "Hi, you've reached Joel's server."
 
-
-# Listen to /lockout from slack. The state and context are global, so
-# there is only a single conversation running with lockout bot at a time.
+# Global state and context for the lockout bot: there will only be a
+# single conversation runnning at a time.
 state, context = 'START', {}
 
+# Listen to /lockout from Slack.
 @app.route('/lockoutbot', methods=['POST'])
 def lockoutbot_endpoint():
     global state, context
@@ -28,7 +28,9 @@ def lockoutbot_endpoint():
     # next slash command is back at the start.
     if state == 'END':
         state, context = 'START', {}
-        return 'Thanks for the chat!'
+        if output1 != None:
+            return output1
+        return "Thanks for chatting with me."
 
     # Perform the action for the new state
     output2 = lockoutbot.ACTION[state](context)
@@ -39,6 +41,7 @@ def lockoutbot_endpoint():
         return f"{output1}\n{output2}"
 
     return output2
+
 
 def alexa_response(text, shouldEndSession=False):
     return jsonify({
