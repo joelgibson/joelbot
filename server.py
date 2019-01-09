@@ -28,7 +28,7 @@ def lockoutbot_endpoint():
     # The special 'END' state here should reset the bot, so that the
     # next slash command is back at the start.
     if state == 'END':
-        state, context = 'START', {}}
+        state, context = 'START', {}
         return 'Thanks for the chat!'
 
     # Perform the action for the new state
