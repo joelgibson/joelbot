@@ -42,14 +42,43 @@ def lockoutbot_endpoint():
 
 @app.route('/alexa/lockoutbot', methods=['GET', 'POST'])
 def lockoutbot_alexa_endpoint():
+    global state, context
     print(request.get_json())
+
+    request_data = request.get_json()
+    request_type = request_data['request']['type']
+    try:
+        request_query = request_data['request']['intent']['slots']['query']['value']
+    except KeyError:
+        request_query = ''
+
+    request_type = request.json['request']['type']
+
+    # We are starting, so we should reset the state
+    if request_type == 'LaunchRequest':
+        state, context = 'START', {}
+        print('Launched, resetting state')
+    elif request_type == 'IntentRequest':
+        print(f'Processing {request_query} with ({state}, {context})')
+        # Intents will have some input, so we need to process it
+        # Change the conversation state based on the message from the user
+        state, context, output1 = lockoutbot.INPUT[state](request_query, context)
+        print(f'Result ({state}, {context})')
+
+    # Do something based on the state
+    print(f'Starting action ({state}, {context})')
+    output2 = lockoutbot.ACTION[state](context)
+
+    output = f"{output1}\n{output2}" if output1 else output2
+
+    print(f'Giving response {output}')
 
     return jsonify({
         'version': '0.1',
         'response': {
             'outputSpeech': {
                 'type': 'SSML',
-                'ssml': """<speak><voice name="Joey">Hello from bot</voice></speak>"""
+                'ssml': f"""<speak><voice name="Joey">{output}</voice></speak>"""
             }
         }
     })
