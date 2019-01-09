@@ -34,7 +34,6 @@ def scale_bot_endpoint():
 
     return f"{output}\n{output2}"
 
-
 @app.route('/alexa/scalebot')
 def alexa_scalebot():
     return ""
