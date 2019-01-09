@@ -24,6 +24,10 @@ def scale_bot_endpoint():
     line = request.form.get('text')
     state, context, output = scalebot.INPUT[state](line, context)
 
+    if state == 'END':
+        state, context = scalebot.START_STATE, None
+        return 'Thanks for the chat!'
+
     output2 = scalebot.ACTION[state](context)
 
     if output:
