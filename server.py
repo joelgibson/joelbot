@@ -53,6 +53,7 @@ def lockoutbot_alexa_endpoint():
         request_query = ''
 
     request_type = request.json['request']['type']
+    output = ''
 
     # We are starting, so we should reset the state
     if request_type == 'LaunchRequest':
@@ -63,13 +64,13 @@ def lockoutbot_alexa_endpoint():
         # Intents will have some input, so we need to process it
         # Change the conversation state based on the message from the user
         state, context, output1 = lockoutbot.INPUT[state](request_query, context)
+        if output1:
+            output += output1 + '\n'
         print(f'Result ({state}, {context})')
 
     # Do something based on the state
     print(f'Starting action ({state}, {context})')
-    output2 = lockoutbot.ACTION[state](context)
-
-    output = f"{output1}\n{output2}" if output1 else output2
+    output += lockoutbot.ACTION[state](context)
 
     print(f'Giving response {output}')
 
