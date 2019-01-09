@@ -42,6 +42,8 @@ def lockoutbot_endpoint():
 
 @app.route('/alexa/lockoutbot', methods=['GET', 'POST'])
 def lockoutbot_alexa_endpoint():
+    print(request.get_json())
+
     return jsonify({
         'version': '0.1',
         'response': {
