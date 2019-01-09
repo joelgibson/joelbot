@@ -80,7 +80,8 @@ def lockoutbot_alexa_endpoint():
             'outputSpeech': {
                 'type': 'SSML',
                 'ssml': f"""<speak><voice name="Joey">{output}</voice></speak>"""
-            }
+            },
+            'shouldEndSession': False
         }
     })
 
